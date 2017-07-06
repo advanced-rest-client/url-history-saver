@@ -1,6 +1,6 @@
 {
   "name": "url-history-saver",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "Apache-2.0 OR CC-BY-4.0",
   "description": "An element that saves Request URL in history and serves list of saved URLs",
   "devDependencies": {
