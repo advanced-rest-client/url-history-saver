@@ -1,0 +1,145 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/test-helpers.js"></script>
+    <link rel="import" href="../url-history-saver.html">
+    <script src="common.js"></script>
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <url-history-saver></url-history-saver>
+      </template>
+    </test-fixture>
+
+    <script>
+    /* global UrlHistoryHelper, fixture, assert */
+    suite('Storing the data', function() {
+      var element;
+
+      var baseUrl = 'https://api.mulesoft.com/endpoint/path?query=parameter';
+      var similarUrl = 'https://api.mulesoft.com/';
+      var otherUrl = 'https://api.domain.com/endpoint/';
+
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      suite('query()', function() {
+        suiteSetup(function() {
+          return UrlHistoryHelper.deleteDatabase()
+          .then(function() {
+            UrlHistoryHelper.insertData([
+              baseUrl, similarUrl, otherUrl
+            ]);
+          });
+        });
+
+        test('Should not result with data', function() {
+          return element.query('ranodm')
+          .then(function(result) {
+            assert.typeOf(result, 'array', 'Result is an array');
+            assert.lengthOf(result, 0, 'Result is empty');
+          });
+        });
+
+        test('Should result with single URL that equals URL', function() {
+          return element.query(baseUrl)
+          .then(function(result) {
+            assert.lengthOf(result, 1);
+          });
+        });
+
+        test('Should result with matching URLs', function() {
+          return element.query(similarUrl)
+          .then(function(result) {
+            assert.lengthOf(result, 2);
+          });
+        });
+
+        test('Should result with not valid URL', function() {
+          return element.query('https')
+          .then(function(result) {
+            assert.lengthOf(result, 3);
+          });
+        });
+      });
+
+      suite('query() event based', function() {
+
+        suiteSetup(function() {
+          return UrlHistoryHelper.deleteDatabase()
+          .then(function() {
+            UrlHistoryHelper.insertData([
+              baseUrl, similarUrl, otherUrl
+            ]);
+          });
+        });
+
+        test('Should not result with data', function() {
+          var event = UrlHistoryHelper.fire('url-history-query', {
+            q: 'ranodm'
+          });
+          return event.detail.result
+          .then(function(result) {
+            assert.typeOf(result, 'array', 'Result is an array');
+            assert.lengthOf(result, 0, 'Result is empty');
+          });
+        });
+
+        test('Should result with single URL that equals URL', function() {
+          var event = UrlHistoryHelper.fire('url-history-query', {
+            q: baseUrl
+          });
+          return event.detail.result
+          .then(function(result) {
+            assert.lengthOf(result, 1);
+          });
+        });
+
+        test('Should result with matching URLs', function() {
+          var event = UrlHistoryHelper.fire('url-history-query', {
+            q: similarUrl
+          });
+          return event.detail.result
+          .then(function(result) {
+            assert.lengthOf(result, 2);
+          });
+        });
+
+        test('Should result with not valid URL', function() {
+          var event = UrlHistoryHelper.fire('url-history-query', {
+            q: 'https'
+          });
+          return event.detail.result
+          .then(function(result) {
+            assert.lengthOf(result, 3);
+          });
+        });
+
+        test('Event is cancelled', function() {
+          var event = UrlHistoryHelper.fire('url-history-query', {
+            value: baseUrl
+          });
+          assert.isTrue(event.defaultPrevented);
+        });
+      });
+    });
+    </script>
+
+  </body>
+</html>
