@@ -10,6 +10,9 @@ UrlHistoryHelper.fire = function(name, detail, node) {
   (node || document).dispatchEvent(event);
   return event;
 };
+UrlHistoryHelper.getDatabase = function() {
+  return new PouchDB('url-history');
+};
 UrlHistoryHelper.insertData = function(urls) {
   urls = urls.map(function(url, i) {
     return {
@@ -18,8 +21,7 @@ UrlHistoryHelper.insertData = function(urls) {
       time: Date.now() + i
     };
   });
-  var db = new PouchDB('url-history');
-  return db.bulkDocs(urls);
+  return UrlHistoryHelper.getDatabase().bulkDocs(urls);
 };
 /**
  * Deletes PouchDB database

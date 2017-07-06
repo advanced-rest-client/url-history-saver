@@ -34,15 +34,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var baseUrl = 'https://api.mulesoft.com/endpoint/path?query=parameter';
       var otherUrl = 'https://api.domain.com/endpoint/';
 
-      setup(function() {
-        element = fixture('basic');
-      });
-
       suite('store()', function() {
         var previousInsert;
 
-        suiteSetup(function() {
-          return UrlHistoryHelper.deleteDatabase();
+        suiteSetup(function(done) {
+          setTimeout(function() {
+            UrlHistoryHelper.deleteDatabase().then(function() {
+              done();
+            });
+          }, 2000);
+        });
+
+        suiteTeardown(function(done) {
+          setTimeout(function() {
+            done();
+          }, 2000);
+        });
+
+        setup(function() {
+          element = fixture('basic');
         });
 
         test('Stores the URL', function() {
@@ -68,56 +78,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             assert.isTrue(result.ok, 'Operation succeeded');
             assert.notEqual(result.id, previousInsert.id, 'IDs are different');
           });
-        });
-      });
-
-      suite('store() event based', function() {
-        var previousInsert;
-
-        suiteSetup(function() {
-          return UrlHistoryHelper.deleteDatabase();
-        });
-
-        test('Stores the URL', function() {
-          var event = UrlHistoryHelper.fire('url-history-store', {
-            value: baseUrl
-          });
-          return event.detail.result
-          .then(function(result) {
-            assert.isTrue(result.ok);
-            previousInsert = result;
-          });
-        });
-
-        test('Updates existing URL data', function() {
-          console.log('Updates existing URL data -> FIRE');
-          var event = UrlHistoryHelper.fire('url-history-store', {
-            value: baseUrl
-          });
-          return event.detail.result
-          .then(function(result) {
-            assert.isTrue(result.ok, 'Operation succeeded');
-            assert.equal(result.id, previousInsert.id, 'Ids matches previous');
-            assert.notEqual(result.rev, previousInsert.rev, 'Rev is different');
-          });
-        });
-
-        test('Creates another URL data', function() {
-          var event = UrlHistoryHelper.fire('url-history-store', {
-            value: otherUrl
-          });
-          return event.detail.result
-          .then(function(result) {
-            assert.isTrue(result.ok, 'Operation succeeded');
-            assert.notEqual(result.id, previousInsert.id, 'IDs are different');
-          });
-        });
-
-        test('Event is cancelled', function() {
-          var event = UrlHistoryHelper.fire('url-history-store', {
-            value: baseUrl
-          });
-          assert.isTrue(event.defaultPrevented);
         });
       });
     });

@@ -41,7 +41,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       suite('query()', function() {
         suiteSetup(function() {
-          return UrlHistoryHelper.deleteDatabase()
+          // return UrlHistoryHelper.deleteDatabase()
+          return UrlHistoryHelper.getDatabase().destroy()
           .then(function() {
             UrlHistoryHelper.insertData([
               baseUrl, similarUrl, otherUrl
@@ -80,9 +81,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       suite('query() event based', function() {
-
         suiteSetup(function() {
-          return UrlHistoryHelper.deleteDatabase()
+          return UrlHistoryHelper.getDatabase().destroy()
+          // return UrlHistoryHelper.deleteDatabase()
           .then(function() {
             UrlHistoryHelper.insertData([
               baseUrl, similarUrl, otherUrl
