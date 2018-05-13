@@ -1,7 +1,7 @@
-var UrlHistoryHelper = {};
+const UrlHistoryHelper = {};
 
 UrlHistoryHelper.fire = function(name, detail, node) {
-  var event = new CustomEvent(name, {
+  const event = new CustomEvent(name, {
     bubbles: true,
     composed: true,
     cancelable: true,
@@ -30,7 +30,7 @@ UrlHistoryHelper.insertData = function(urls) {
  */
 UrlHistoryHelper.deleteDatabase = function() {
   return new Promise(function(resolve, reject) {
-    var request = window.indexedDB.deleteDatabase('_pouch_url-history');
+    const request = window.indexedDB.deleteDatabase('_pouch_url-history');
     request.onerror = function() {
       reject(new Error('Unable to delete _pouch_url-history database'));
     };
