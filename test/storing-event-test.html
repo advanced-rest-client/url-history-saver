@@ -1,22 +1,13 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
   <script src="../../web-component-tester/browser.js"></script>
-  <script src="../../iron-test-helpers/test-helpers.js"></script>
   <link rel="import" href="../url-history-saver.html">
+  <link rel="import" href="../../arc-polyfills/arc-polyfills.html">
+  <link rel="import" href="../../app-pouchdb/pouchdb.html">
   <script src="common.js"></script>
 </head>
 
@@ -27,13 +18,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
   <script>
-  /* global UrlHistoryHelper, fixture, assert */
+  /* global UrlHistoryHelper */
   suite('Storing the data event based', function() {
-    var element;
-    var previousInsert;
+    let element;
+    let previousInsert;
 
-    var baseUrl = 'https://api.mulesoft.com/endpoint/path?query=parameter';
-    var otherUrl = 'https://api.domain.com/endpoint/';
+    const baseUrl = 'https://api.mulesoft.com/endpoint/path?query=parameter';
+    const otherUrl = 'https://api.domain.com/endpoint/';
 
     setup(function() {
       element = fixture('basic');
@@ -45,7 +36,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           done();
         });
       }, 2000);
-      // return UrlHistoryHelper.deleteDatabase();
     });
 
     suiteTeardown(function(done) {
@@ -55,10 +45,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     test('Stores the URL', function() {
-      var event = UrlHistoryHelper.fire('url-history-store', {
+      const e = UrlHistoryHelper.fire('url-history-store', {
         value: baseUrl
       });
-      return event.detail.result
+      return e.detail.result
         .then(function(result) {
           assert.isTrue(result.ok);
           previousInsert = result;
@@ -66,11 +56,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     test('Updates existing URL data', function() {
-      console.log('Updates existing URL data -> FIRE');
-      var event = UrlHistoryHelper.fire('url-history-store', {
+      const e = UrlHistoryHelper.fire('url-history-store', {
         value: baseUrl
       });
-      return event.detail.result
+      return e.detail.result
         .then(function(result) {
           assert.isTrue(result.ok, 'Operation succeeded');
           assert.equal(result.id, previousInsert.id, 'Ids matches previous');
@@ -79,10 +68,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     test('Creates another URL data', function() {
-      var event = UrlHistoryHelper.fire('url-history-store', {
+      const e = UrlHistoryHelper.fire('url-history-store', {
         value: otherUrl
       });
-      return event.detail.result
+      return e.detail.result
         .then(function(result) {
           assert.isTrue(result.ok, 'Operation succeeded');
           assert.notEqual(result.id, previousInsert.id, 'IDs are different');
@@ -90,10 +79,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     test('Event is cancelled', function() {
-      var event = UrlHistoryHelper.fire('url-history-store', {
+      const e = UrlHistoryHelper.fire('url-history-store', {
         value: baseUrl
       });
-      assert.isTrue(event.defaultPrevented);
+      assert.isTrue(e.defaultPrevented);
     });
   });
   </script>

@@ -1,16 +1,17 @@
-var UrlHistoryHelper = {};
+const UrlHistoryHelper = {};
 
 UrlHistoryHelper.fire = function(name, detail, node) {
-  var event = new CustomEvent(name, {
+  const e = new CustomEvent(name, {
     bubbles: true,
     composed: true,
     cancelable: true,
     detail: detail
   });
-  (node || document).dispatchEvent(event);
-  return event;
+  (node || document.body).dispatchEvent(e);
+  return e;
 };
 UrlHistoryHelper.getDatabase = function() {
+  /* global PouchDB */
   return new PouchDB('url-history');
 };
 UrlHistoryHelper.insertData = function(urls) {
@@ -18,7 +19,8 @@ UrlHistoryHelper.insertData = function(urls) {
     return {
       _id: url,
       cnt: 1,
-      time: Date.now() + i
+      time: Date.now() + i,
+      url: url
     };
   });
   return UrlHistoryHelper.getDatabase().bulkDocs(urls);
@@ -30,7 +32,7 @@ UrlHistoryHelper.insertData = function(urls) {
  */
 UrlHistoryHelper.deleteDatabase = function() {
   return new Promise(function(resolve, reject) {
-    var request = window.indexedDB.deleteDatabase('_pouch_url-history');
+    const request = window.indexedDB.deleteDatabase('_pouch_url-history');
     request.onerror = function() {
       reject(new Error('Unable to delete _pouch_url-history database'));
     };
